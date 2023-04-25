@@ -14,9 +14,13 @@ import (
 var (
 	target    = "https://api.openai.com" // 目标域名
 	httpProxy = "http://127.0.0.1:10809" // 本地代理地址和端口
+	timeout   = 60 * time.Second
 )
 
 func main() {
+	if os.Getenv("TIME_OUT") != "" {
+		timeout, _ = time.ParseDuration(os.Getenv("TIME_OUT"))
+	}
 	http.HandleFunc("/", handleRequest)
 	http.ListenAndServe(":9000", nil)
 }
@@ -54,7 +58,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	// 默认超时时间设置为60s
 	client := &http.Client{
-		Timeout: 60 * time.Second,
+		Timeout: timeout,
 	}
 
 	// 本地测试通过代理请求 OpenAI 接口
